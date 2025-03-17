@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI伴侣</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* 初始样式，防止白屏闪烁 */
+        html, body {
+            margin: 0;
+            padding: 0;
+            background-color: #EEF2FF;
+            background-image: linear-gradient(120deg, #EEF2FF 0%, #F5F3FF 100%);
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #EEF2FF;
+            background-image: linear-gradient(120deg, #EEF2FF 0%, #F5F3FF 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        /* 确保chat-header背景色不变 */
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary-color, #3B82F6), var(--secondary-color, #8B5CF6)) !important;
+            transition: none !important;
+        }
+    </style>
+    <link href="../static/css/style.css" rel="stylesheet">
+    <link href="../static/css/avatars.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="page-loader">
+        <div class="loader"></div>
+        <div class="loader-text">正在连接AI伴侣...</div>
+    </div>
+    
+    <div class="chat-container animate__animated animate__fadeIn">
+        <div class="chat-header">
+            <h2 class="animate__animated animate__fadeInDown">好玩、有趣、有灵魂~</h2>
+            <div class="role-selector animate__animated animate__fadeInUp">
+                <select id="ai-role">
+                    <option value="nurse">👩‍⚕️ 资深临床护理专家</option>
+                    <option value="storyteller">✨ 故事讲述者</option>
+                    <option value="rpg-master">🎲 RPG游戏主持人</option>
+                    <option value="artist">🎨 艺术创作助手</option>
+                    <option value="teacher">📚 教育辅导员</option>
+                </select>
+                <button id="change-role">切换角色</button>
+            </div>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message ai nurse animate__animated animate__fadeInUp">
+                <div class="avatar"></div>
+                <div class="message-wrapper">
+                    <div class="message-sender">资深临床护理专家</div>
+                    <div class="message-content typing-effect">小主您可算来了~ 奴家已等候多时，请尽情吩咐我吧~</div>
+                </div>
+            </div>
+        </div>
+        <div class="quick-phrases">
+            <div class="quick-phrase" data-text="简单介绍一下你自己">
+                <span class="phrase-number">1</span>
+                <span class="phrase-text">简单介绍一下你自己</span>
+            </div>
+            <div class="quick-phrase" data-text="人生的意义是什么">
+                <span class="phrase-number">2</span>
+                <span class="phrase-text">人生的意义是什么</span>
+            </div>
+            <div class="quick-phrase" data-text="人生苦短，放过自己，也放过他人">
+                <span class="phrase-number">3</span>
+                <span class="phrase-text">人生苦短，放过自己，也放过他人</span>
+            </div>
+        </div>
+        <div class="chat-input animate__animated animate__fadeInUp">
+            <input type="text" id="message-input" placeholder="输入你的消息...">
+            <button id="send-button">
+                <span class="button-text">发送</span>
+                <span class="button-icon">➤</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let currentRole = 'nurse';
+        let isTypingEffect = true;
+
+        // 添加快捷短语点击事件
+        document.querySelectorAll('.quick-phrase').forEach(phrase => {
+            phrase.addEventListener('click', function() {
+                const text = this.getAttribute('data-text');
+                if (text && ws && ws.readyState === WebSocket.OPEN) {
+                    displayMessage({
+                        type: 'text',
+                        content: text,
+                        sender: 'user'
+                    });
+                    
+                    ws.send(JSON.stringify({
+                        type: 'message',
+                        content: text
+                    }));
+                    
+                    // 添加点击动画
+                    this.classList.add('animate__animated', 'animate__pulse');
+                    setTimeout(() => {
+                        this.classList.remove('animate__animated', 'animate__pulse');
+                    }, 500);
+                }
+            });
+        });
+
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', function() {
+            // 确保背景色已经应用
+            document.body.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--background-color').trim();
+            
+            // 预加载主要元素
+            setTimeout(function() {
+                document.querySelector('.chat-container').style.opacity = '1';
+            }, 100);
+        });
+
+        window.addEventListener('load', function() {
+            // 页面完全加载后，显示内容并隐藏加载器
+            setTimeout(function() {
+                document.querySelector('.page-loader').classList.add('loaded');
+                setTimeout(function() {
+                    document.querySelector('.page-loader').style.display = 'none';
+                }, 500);
+            }, 1000);
+            
+            // 连接WebSocket
+            connectWebSocket();
+        });
+
+        function connectWebSocket() {
+            // 使用本地服务器
+            ws = new WebSocket('ws://localhost:9000/ws');
+            // 使用远程服务器
+            // ws = new WebSocket('ws://124.222.228.25:9000/ws');
+            
+            ws.onopen = function() {
+                // 连接建立后立即发送角色切换消息
+                ws.send(JSON.stringify({
+                    type: 'change_role',
+                    role: currentRole
+                }));
+            };
+            
+            ws.onmessage = function(event) {
+                const message = JSON.parse(event.data);
+                handleMessage(message);
+            };
+            
+            ws.onclose = function() {
+                console.log('WebSocket连接已关闭');
+                setTimeout(connectWebSocket, 1000);  // 1秒后尝试重连
+            };
+            
+            ws.onerror = function(error) {
+                console.error('WebSocket错误:', error);
+            };
+        }
+        
+        function handleMessage(data) {
+            if (data.type === 'text_stream') {
+                // 处理流式文本消息
+                const messages = document.querySelector('.chat-messages');
+                let lastMessage = messages.lastElementChild;
+                // 如果最后一条消息不是 AI 的消息，创建新的消息元素
+                if (!lastMessage || !lastMessage.classList.contains('ai')) {
+                    lastMessage = createMessageElement('AI', '');
+                    lastMessage.classList.add('animate__animated', 'animate__fadeInUp');
+                    messages.appendChild(lastMessage);
+                }
+                const contentElement = lastMessage.querySelector('.message-content');
+                let buffer = contentElement.getAttribute('data-buffer') || '';
+                buffer += data.content;
+                // 更新缓冲区
+                contentElement.setAttribute('data-buffer', buffer);
+                // 尝试提取文字回复内容
+                const startTag = '<文字回复>';
+                const endTag = '</文字回复>';
+                const startIndex = buffer.indexOf(startTag);
+                if (startIndex !== -1) {
+                    const endIndex = buffer.indexOf(endTag, startIndex);
+                    if (endIndex !== -1) {
+                        // 找到完整的文字回复
+                        const replyText = buffer.substring(startIndex + startTag.length, endIndex)
+                            .replace(/^\n+|\n+$/g, ''); // 去除开头和结尾的换行符
+                        contentElement.textContent = replyText;
+                    } else {
+                        // 找到开始标签但还没有结束标签
+                        const replyText = buffer.substring(startIndex + startTag.length)
+                            .replace(/^\n+/g, ''); // 去除开头的换行符
+                        contentElement.textContent = replyText;
+                    }
+                }
+                // 滚动到底部
+                messages.scrollTop = messages.scrollHeight;
+            } else if (data.type === 'system') {
+                appendMessage('system', data.content);
+            } else if (data.type === 'error') {
+                appendMessage('system', `❌ ${data.content}`);
+            } else if (data.type === 'image') {
+                const messages = document.querySelector('.chat-messages');
+                let lastMessage = messages.lastElementChild;
+                
+                if (lastMessage && lastMessage.classList.contains('ai')) {
+                    const contentElement = lastMessage.querySelector('.message-content');
+                    const img = document.createElement('img');
+                    img.src = data.content;
+                    img.alt = '生成的图片';
+                    img.loading = 'lazy';
+                    img.classList.add('animate__animated', 'animate__fadeIn');
+                    contentElement.appendChild(document.createElement('br'));
+                    contentElement.appendChild(img);
+                    messages.scrollTop = messages.scrollHeight;
+                } else {
+                    // 如果没有找到AI消息，创建新的消息元素
+                    const messageElement = createMessageElement('AI', '');
+                    messageElement.classList.add('animate__animated', 'animate__fadeInUp');
+                    const contentElement = messageElement.querySelector('.message-content');
+                    const img = document.createElement('img');
+                    img.src = data.content;
+                    img.alt = '生成的图片';
+                    img.loading = 'lazy';
+                    img.classList.add('animate__animated', 'animate__fadeIn');
+                    contentElement.appendChild(img);
+                    messages.appendChild(messageElement);
+                    messages.scrollTop = messages.scrollHeight;
+                }
+            }
+        }
+        
+        // 添加角色名称映射
+        const roleNames = {
+            'nurse': '资深临床护理专家',
+            'storyteller': '故事讲述者',
+            'rpg-master': 'RPG游戏主持人',
+            'artist': '艺术创作助手',
+            'teacher': '教育辅导员'
+        };
+
+        function createMessageElement(sender, content) {
+            const messageDiv = document.createElement('div');
+            if (sender.toLowerCase() === 'system') {
+                console.log('系统消息');
+                // 系统消息居中显示，不需要头像和发送者名称
+                messageDiv.className = 'message system animate__animated animate__fadeIn';
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+                contentDiv.textContent = content;
+                messageDiv.appendChild(contentDiv);
+            } else {
+                // AI或用户消息
+                if (sender.toLowerCase() === 'ai') {
+                    messageDiv.className = `message ai ${currentRole} animate__animated animate__fadeInUp`;
+                } else {
+                    messageDiv.className = `message ${sender.toLowerCase()} animate__animated animate__fadeInUp animate__faster`;
+                }
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'avatar';
+                
+                const wrapper = document.createElement('div');
+                wrapper.className = 'message-wrapper';
+                
+                const senderDiv = document.createElement('div');
+                senderDiv.className = 'message-sender';
+                // 根据发送者类型设置显示名称
+                if (sender.toLowerCase() === 'ai') {
+                    senderDiv.textContent = roleNames[currentRole] || 'AI助手';
+                } else {
+                    senderDiv.textContent = '我';
+                }
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+                if (sender.toLowerCase() === 'ai' && isTypingEffect) {
+                    contentDiv.classList.add('typing-effect');
+                }
+                contentDiv.textContent = content;
+                
+                wrapper.appendChild(senderDiv);
+                wrapper.appendChild(contentDiv);
+                
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(wrapper);
+            }
+            
+            return messageDiv;
+        }
+
+        function displayMessage(message) {
+            const messagesContainer = document.querySelector('.chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('animate__animated', 'animate__fadeInUp');
+            
+            const messageWrapper = document.createElement('div');
+            messageWrapper.className = 'message-wrapper';
+            
+            if (message.type === 'system') {
+                // 系统消息居中显示
+                messageDiv.className = 'message system animate__animated animate__fadeIn';
+                const content = document.createElement('div');
+                content.className = 'message-content';
+                content.textContent = message.content;
+                messageWrapper.appendChild(content);
+                messageDiv.appendChild(messageWrapper);
+            } else if (message.type === 'error') {
+                // 错误消息显示为系统消息，但使用红色
+                messageDiv.className = 'message system animate__animated animate__shakeX';
+                const content = document.createElement('div');
+                content.className = 'message-content';
+                content.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                content.style.color = '#EF4444';
+                content.textContent = message.content;
+                messageWrapper.appendChild(content);
+                messageDiv.appendChild(messageWrapper);
+            } else {
+                // 普通消息（文本或图片）
+                messageDiv.className = `message ${message.sender === 'user' ? 'user' : 'ai'} animate__animated animate__fadeInUp`;
+                
+                if (message.sender === 'user') {
+                    messageDiv.classList.add('animate__faster');
+                } else if (message.sender === 'ai') {
+                    messageDiv.classList.add(currentRole);
+                }
+                
+                // 添加头像
+                const avatar = document.createElement('div');
+                avatar.className = 'avatar';
+                messageDiv.appendChild(avatar);
+                
+                // 添加发送者名称
+                const sender = document.createElement('div');
+                sender.className = 'message-sender';
+                if (message.sender === 'user') {
+                    sender.textContent = '我';
+                } else {
+                    sender.textContent = roleNames[currentRole] || 'AI助手';
+                }
+                messageWrapper.appendChild(sender);
+                
+                // 添加消息内容
+                const content = document.createElement('div');
+                content.className = 'message-content';
+                
+                if (message.type === 'text') {
+                    content.textContent = message.content;
+                    if (message.sender === 'ai' && isTypingEffect) {
+                        content.classList.add('typing-effect');
+                    }
+                } else if (message.type === 'image') {
+                    const img = document.createElement('img');
+                    img.src = message.content;
+                    img.alt = 'AI生成的图片';
+                    img.loading = 'lazy';
+                    img.classList.add('animate__animated', 'animate__fadeIn');
+                    content.appendChild(img);
+                }
+                
+                messageWrapper.appendChild(content);
+                messageDiv.appendChild(messageWrapper);
+            }
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // 添加发送按钮动画
+            const sendButton = document.getElementById('send-button');
+            sendButton.classList.add('animate__animated', 'animate__pulse');
+            setTimeout(() => {
+                sendButton.classList.remove('animate__animated', 'animate__pulse');
+            }, 500);
+        }
+        
+        document.getElementById('send-button').addEventListener('click', sendMessage);
+        document.getElementById('message-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        document.getElementById('change-role').addEventListener('click', function() {
+            const roleSelect = document.getElementById('ai-role');
+            const selectedRole = roleSelect.value;
+            currentRole = selectedRole;
+            
+            // 添加角色切换动画
+            const button = document.getElementById('change-role');
+            button.classList.add('animate__animated', 'animate__rubberBand');
+            setTimeout(() => {
+                button.classList.remove('animate__animated', 'animate__rubberBand');
+            }, 1000);
+            
+            // 确保chat-header的背景色不变
+            const chatHeader = document.querySelector('.chat-header');
+            // 强制应用背景色
+            chatHeader.style.background = 'linear-gradient(135deg, var(--primary-color, #3B82F6), var(--secondary-color, #8B5CF6))';
+            
+            // 更新所有AI消息的角色类名和名称，但保持其他样式不变
+            const aiMessages = document.querySelectorAll('.chat-messages .message.ai');
+            aiMessages.forEach(message => {
+                // 保存原有的动画类
+                const hasAnimatedClass = message.classList.contains('animate__animated');
+                const hasFadeInUpClass = message.classList.contains('animate__fadeInUp');
+                
+                // 移除所有角色相关的类
+                message.classList.remove('nurse', 'storyteller', 'rpg-master', 'artist', 'teacher');
+                
+                // 确保保留基本类
+                message.classList.add('message', 'ai', selectedRole);
+                
+                // 添加动画效果
+                message.classList.add('animate__animated', 'animate__pulse');
+                
+                // 更新显示的名称
+                const senderElement = message.querySelector('.message-sender');
+                if (senderElement) {
+                    senderElement.textContent = roleNames[selectedRole] || 'AI助手';
+                }
+                
+                setTimeout(() => {
+                    message.classList.remove('animate__pulse');
+                    if (!hasAnimatedClass) message.classList.remove('animate__animated');
+                    if (hasFadeInUpClass) message.classList.add('animate__fadeInUp');
+                }, 500);
+            });
+            
+            // 确保chat-header的背景色恢复
+            setTimeout(() => {
+                // 再次强制应用背景色
+                chatHeader.style.background = 'linear-gradient(135deg, var(--primary-color, #3B82F6), var(--secondary-color, #8B5CF6))';
+            }, 100);
+            
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'change_role',
+                    role: selectedRole
+                }));
+            }
+        });
+        
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+            
+            if (message && ws && ws.readyState === WebSocket.OPEN) {
+                displayMessage({
+                    type: 'text',
+                    content: message,
+                    sender: 'user'
+                });
+                
+                ws.send(JSON.stringify({
+                    type: 'message',
+                    content: message
+                }));
+                
+                input.value = '';
+                
+                // 添加输入框动画
+                input.classList.add('animate__animated', 'animate__fadeIn');
+                setTimeout(() => {
+                    input.classList.remove('animate__animated', 'animate__fadeIn');
+                }, 500);
+            }
+        }
+        
+        function appendMessage(sender, content) {
+            const messages = document.querySelector('.chat-messages');
+            const messageElement = createMessageElement(sender, content);
+            messages.appendChild(messageElement);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function appendImage(url) {
+            const messages = document.querySelector('.chat-messages');
+            const lastMessage = messages.lastElementChild;
+            
+            if (lastMessage && lastMessage.classList.contains('ai')) {
+                const contentDiv = lastMessage.querySelector('.message-content');
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = '生成的图片';
+                img.classList.add('animate__animated', 'animate__fadeIn');
+                contentDiv.appendChild(img);
+                messages.scrollTop = messages.scrollHeight;
+            }
+        }
+    </script>
+</body>
+</html> 
