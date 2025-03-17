@@ -1,0 +1,144 @@
+<!-- index.wxml -->
+<view class="page">
+  <!-- 加载状态 -->
+  <view class="loading-overlay" wx:if="{{isLoading && !isConnected}}">
+    <view class="loading-content">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">正在连接AI伴侣...</text>
+    </view>
+  </view>
+
+  <view class="chat-container {{isLoading ? '' : 'fade-in'}}">
+    <!-- 头部 -->
+    <view class="chat-header">
+      <view class="header-content">
+        <text class="header-title fade-in">好玩、有趣、有灵魂~</text>
+        <view class="role-selector fade-in">
+          <view class="role-select">
+            <picker bindchange="handleRoleChange" value="{{roleIndex}}" range="{{roleList}}" range-key="name">
+              <view class="picker-content">
+                <text>{{currentRole.name}}</text>
+                <view class="select-arrow">▼</view>
+              </view>
+            </picker>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 消息列表 -->
+    <scroll-view 
+      class="chat-messages" 
+      scroll-y="true" 
+      scroll-top="{{scrollTop}}"
+      scroll-with-animation="{{true}}"
+      enable-flex="true"
+      enhanced="true"
+      show-scrollbar="false"
+      bindscrolltoupper="onScrollToUpper"
+      style="padding-bottom: {{keyboardHeight}}px"
+    >
+      <view id="messages-container">
+        <block wx:for="{{messages}}" wx:key="id">
+          <view class="message {{item.sender}} {{item.role}} fade-in">
+            <block wx:if="{{item.sender === 'ai'}}">
+              <view class="avatar-container">
+                <view class="avatar">
+                  <image 
+                    class="avatar-image" 
+                    src="/images/airole/{{item.role}}.jpg"
+                    mode="aspectFill"
+                  />
+                </view>
+                <text class="message-sender">{{currentRole.name}}</text>
+              </view>
+              <view class="message-wrapper">
+                <view class="message-content {{item.sender === 'ai' ? 'typing-effect' : ''}}">
+                  <text>{{item.content}}</text>
+                  <image 
+                    wx:if="{{item.image}}" 
+                    src="{{item.image}}" 
+                    mode="widthFix" 
+                    class="message-image fade-in"
+                    bindtap="previewImage"
+                    data-url="{{item.image}}"
+                    bindload="scrollToBottom"
+                  ></image>
+                </view>
+              </view>
+            </block>
+            
+            <block wx:elif="{{item.sender === 'user'}}">
+              <view class="message-wrapper">
+                <view class="message-content">
+                  <text>{{item.content}}</text>
+                  <image 
+                    wx:if="{{item.image}}" 
+                    src="{{item.image}}" 
+                    mode="widthFix" 
+                    class="message-image fade-in"
+                    bindtap="previewImage"
+                    data-url="{{item.image}}"
+                    bindload="scrollToBottom"
+                  ></image>
+                </view>
+              </view>
+              <view class="avatar">
+                <image 
+                  class="avatar-image" 
+                  src="/images/airole/user.jpg"
+                  mode="aspectFill"
+                />
+              </view>
+            </block>
+            
+            <block wx:elif="{{item.sender === 'system'}}">
+              <view class="message-wrapper">
+                <view class="message-content">
+                  <text>{{item.content}}</text>
+                </view>
+              </view>
+            </block>
+          </view>
+        </block>
+      </view>
+    </scroll-view>
+
+    <!-- 底部容器 -->
+    <view class="bottom-container" style="bottom: {{keyboardHeight}}px">
+      <!-- 快捷短语 -->
+      <view class="quick-phrases">
+        <view 
+          wx:for="{{quickPhrases}}" 
+          wx:key="text"
+          class="quick-phrase" 
+          bindtap="sendQuickPhrase" 
+          data-text="{{item.text}}"
+        >
+          <text class="phrase-number">{{index + 1}}</text>
+          <text class="phrase-text">{{item.text}}</text>
+        </view>
+      </view>
+
+      <!-- 输入框 -->
+      <view class="chat-input">
+        <input 
+          type="text" 
+          value="{{inputMessage}}" 
+          placeholder="输入你的消息..." 
+          bindinput="handleInput"
+          bindconfirm="sendMessage"
+          bindfocus="onInputFocus"
+          bindblur="onInputBlur"
+          adjust-position="{{false}}"
+          confirm-type="send"
+          hold-keyboard="{{true}}"
+        />
+        <button class="send-button {{inputMessage ? 'active' : ''}}" bindtap="sendMessage">
+          <text class="button-text">发送</text>
+          <text class="button-icon">➤</text>
+        </button>
+      </view>
+    </view>
+  </view>
+</view> 

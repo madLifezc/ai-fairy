@@ -1,0 +1,32 @@
+<!-- about.wxml -->
+<view class="container">
+  <view class="header">
+    <text class="title">关于我们</text>
+  </view>
+
+  <view class="content">
+    <view class="logo-section">
+      <image class="logo" src="/images/logo.png" mode="aspectFit"></image>
+      <text class="app-name">AI精灵</text>
+      <text class="version">版本 1.0.0</text>
+    </view>
+
+    <view class="info-section">
+      <view class="info-item">
+        <text class="info-title">产品介绍</text>
+        <text class="info-content">AI精灵是一款智能聊天助手，能够为您提供智能对话、文字识别、语音转换等多种AI服务。</text>
+      </view>
+
+      <view class="info-item">
+        <text class="info-title">联系我们</text>
+        <text class="info-content">邮箱：support@example.com</text>
+      </view>
+
+      <view class="info-item">
+        <text class="info-title">版权信息</text>
+        <text class="info-content">Copyright © 2024 AI精灵</text>
+        <text class="info-content">All Rights Reserved</text>
+      </view>
+    </view>
+  </view>
+</view> 

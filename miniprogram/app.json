@@ -1,0 +1,48 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/tools/tools",
+    "pages/profile/profile",
+    "pages/food/food",
+    "pages/history/history",
+    "pages/settings/settings",
+    "pages/feedback/feedback",
+    "pages/about/about"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "AI精灵",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "custom": false,
+    "color": "#999999",
+    "selectedColor": "#3B82F6",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "AI精灵",
+        "iconPath": "images/tabbar/ai.png",
+        "selectedIconPath": "images/tabbar/ai-active.png"
+      },
+      {
+        "pagePath": "pages/tools/tools",
+        "text": "实用工具",
+        "iconPath": "images/tabbar/tools.png",
+        "selectedIconPath": "images/tabbar/tools-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "个人中心",
+        "iconPath": "images/tabbar/profile.png",
+        "selectedIconPath": "images/tabbar/profile-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+} 

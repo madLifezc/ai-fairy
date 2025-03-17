@@ -1,0 +1,44 @@
+<!-- settings.wxml -->
+<view class="container">
+  <view class="header">
+    <text class="title">通用设置</text>
+  </view>
+
+  <view class="settings-list">
+    <!-- 主题设置 -->
+    <view class="settings-group">
+      <view class="group-title">主题设置</view>
+      <view class="settings-item">
+        <text class="item-label">深色模式</text>
+        <switch checked="{{settings.darkMode}}" bindchange="toggleDarkMode" color="#3B82F6"/>
+      </view>
+    </view>
+
+    <!-- 聊天设置 -->
+    <view class="settings-group">
+      <view class="group-title">聊天设置</view>
+      <view class="settings-item">
+        <text class="item-label">消息提醒</text>
+        <switch checked="{{settings.notifications}}" bindchange="toggleNotifications" color="#3B82F6"/>
+      </view>
+      <view class="settings-item">
+        <text class="item-label">声音效果</text>
+        <switch checked="{{settings.sound}}" bindchange="toggleSound" color="#3B82F6"/>
+      </view>
+    </view>
+
+    <!-- 隐私设置 -->
+    <view class="settings-group">
+      <view class="group-title">隐私设置</view>
+      <view class="settings-item">
+        <text class="item-label">自动保存聊天记录</text>
+        <switch checked="{{settings.autoSave}}" bindchange="toggleAutoSave" color="#3B82F6"/>
+      </view>
+    </view>
+  </view>
+
+  <!-- 清除缓存按钮 -->
+  <view class="action-buttons">
+    <button class="clear-cache-btn" bindtap="clearCache">清除缓存</button>
+  </view>
+</view> 

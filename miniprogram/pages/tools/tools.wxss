@@ -1,0 +1,62 @@
+/* tools.wxss */
+.container {
+  padding: 32rpx;
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+.header {
+  padding: 24rpx 0;
+  margin-bottom: 32rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1F2937;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24rpx;
+}
+
+.tool-item {
+  background: white;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.tool-item:active {
+  transform: scale(0.98);
+  background: #fafafa;
+}
+
+.tool-icon {
+  font-size: 48rpx;
+  margin-bottom: 16rpx;
+}
+
+.tool-info {
+  text-align: center;
+}
+
+.tool-name {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8rpx;
+  display: block;
+}
+
+.tool-description {
+  font-size: 24rpx;
+  color: #666;
+  display: block;
+} 

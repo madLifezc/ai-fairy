@@ -1,0 +1,53 @@
+<!-- feedback.wxml -->
+<view class="container">
+  <view class="header">
+    <text class="title">意见反馈</text>
+  </view>
+
+  <view class="feedback-form">
+    <view class="form-group">
+      <text class="label">反馈类型</text>
+      <view class="type-selector">
+        <view 
+          class="type-item {{selectedType === 'bug' ? 'active' : ''}}" 
+          bindtap="selectType" 
+          data-type="bug"
+        >问题反馈</view>
+        <view 
+          class="type-item {{selectedType === 'suggestion' ? 'active' : ''}}" 
+          bindtap="selectType" 
+          data-type="suggestion"
+        >功能建议</view>
+        <view 
+          class="type-item {{selectedType === 'other' ? 'active' : ''}}" 
+          bindtap="selectType" 
+          data-type="other"
+        >其他</view>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <text class="label">反馈内容</text>
+      <textarea 
+        class="feedback-content" 
+        placeholder="请详细描述您的问题或建议..." 
+        maxlength="500" 
+        bindinput="handleInput"
+      ></textarea>
+      <text class="word-count">{{contentLength}}/500</text>
+    </view>
+
+    <view class="form-group">
+      <text class="label">联系方式（选填）</text>
+      <input 
+        class="contact-input" 
+        placeholder="请留下您的邮箱或手机号" 
+        bindinput="handleContactInput"
+      />
+    </view>
+
+    <button class="submit-btn {{canSubmit ? 'active' : ''}}" bindtap="submitFeedback">
+      提交反馈
+    </button>
+  </view>
+</view> 

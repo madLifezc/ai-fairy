@@ -1,0 +1,26 @@
+<!-- history.wxml -->
+<view class="container">
+  <view class="header">
+    <text class="title">聊天记录</text>
+  </view>
+  
+  <view class="history-list">
+    <block wx:if="{{historyList.length > 0}}">
+      <view class="history-item" wx:for="{{historyList}}" wx:key="id">
+        <view class="history-date">{{item.date}}</view>
+        <view class="chat-preview">
+          <view class="preview-content">
+            <text class="preview-text">{{item.lastMessage}}</text>
+          </view>
+          <view class="preview-info">
+            <text class="preview-time">{{item.time}}</text>
+            <text class="preview-count">{{item.messageCount}}条对话</text>
+          </view>
+        </view>
+      </view>
+    </block>
+    <view wx:else class="empty-state">
+      <text>暂无聊天记录</text>
+    </view>
+  </view>
+</view> 

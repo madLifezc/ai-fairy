@@ -1,0 +1,77 @@
+/* history.wxss */
+.container {
+  min-height: 100vh;
+  background: #F9FAFB;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.header {
+  padding: 32rpx 24rpx;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1F2937;
+}
+
+.history-list {
+  padding: 24rpx;
+}
+
+.history-item {
+  margin-bottom: 24rpx;
+  background: white;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.history-date {
+  padding: 16rpx 24rpx;
+  font-size: 24rpx;
+  color: #6B7280;
+  background: #F3F4F6;
+}
+
+.chat-preview {
+  padding: 24rpx;
+}
+
+.preview-content {
+  margin-bottom: 16rpx;
+}
+
+.preview-text {
+  font-size: 28rpx;
+  color: #1F2937;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.preview-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.preview-time {
+  font-size: 24rpx;
+  color: #6B7280;
+}
+
+.preview-count {
+  font-size: 24rpx;
+  color: #3B82F6;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48rpx 0;
+  color: #6B7280;
+  font-size: 28rpx;
+} 

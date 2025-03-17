@@ -1,0 +1,102 @@
+<view class="container">
+  <!-- 设置区域 -->
+  <view class="settings-card">
+    <view class="settings-content">
+      <view class="top-area">
+        <!-- 左侧数量选择区 -->
+        <view class="counters-area">
+          <view class="counter-item">
+            <text>荤菜</text>
+            <view class="number-picker">
+              <view class="picker-btn {{meatCount <= 1 ? 'disabled' : ''}}" bindtap="decreaseMeat">-</view>
+              <text class="number">{{meatCount}}</text>
+              <view class="picker-btn" bindtap="increaseMeat">+</view>
+            </view>
+          </view>
+          
+          <view class="counter-item">
+            <text>素菜</text>
+            <view class="number-picker">
+              <view class="picker-btn {{vegeCount <= 1 ? 'disabled' : ''}}" bindtap="decreaseVege">-</view>
+              <text class="number">{{vegeCount}}</text>
+              <view class="picker-btn" bindtap="increaseVege">+</view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 右侧标题和按钮区 -->
+        <view class="title-action-area">
+          <view class="search-box">
+            <input 
+              class="search-input" 
+              placeholder="输入菜名搜索做法" 
+              value="{{searchText}}"
+              bindinput="onSearchInput"
+            />
+          </view>
+          <button class="submit-btn {{loading ? 'loading' : ''}}" bindtap="generateMenu">
+            {{loading ? '生成中...' : '开始生成'}}
+          </button>
+        </view>
+      </view>
+
+      <!-- 菜单内容展示区域 -->
+      <scroll-view class="menu-content" scroll-y wx:if="{{menuContent}}">
+        <text space="nbsp" decode>{{menuContent}}</text>
+        <!-- 图片生成提示 -->
+        <view class="loading-container" wx:if="{{isGeneratingImage}}">
+          <view class="loading-spinner"></view>
+          <text class="loading-text">正在生成美食图片，请稍候...</text>
+        </view>
+        <!-- 图片展示区域 -->
+        <view class="image-container" wx:if="{{imageUrl}}">
+          <image class="dish-image" src="{{imageUrl}}" mode="widthFix" />
+        </view>
+      </scroll-view>
+
+      <!-- 重新生成按钮 -->
+      <button class="refresh-btn" bindtap="regenerateMenu" wx:if="{{menuContent}}">
+        换一个搭配
+      </button>
+    </view>
+  </view>
+
+  <!-- 结果展示区域 -->
+  <view class="result-card" wx:if="{{showResult}}">
+    <view class="card-title">推荐菜单</view>
+    <view class="menu-list">
+      <view class="menu-category">
+        <text class="category-title">荤菜</text>
+        <view class="dish-item" wx:for="{{meatDishes}}" wx:key="index">
+          <view class="dish-name" bindtap="showRecipe" data-index="{{index}}" data-type="meat">
+            {{item.name}}
+            <text class="arrow">›</text>
+          </view>
+          <view class="dish-recipe" wx:if="{{item.showRecipe}}">
+            <text class="recipe-title">做法步骤：</text>
+            <text class="recipe-content">{{item.recipe}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="menu-category">
+        <text class="category-title">素菜</text>
+        <view class="dish-item" wx:for="{{vegeDishes}}" wx:key="index">
+          <view class="dish-name" bindtap="showRecipe" data-index="{{index}}" data-type="vege">
+            {{item.name}}
+            <text class="arrow">›</text>
+          </view>
+          <view class="dish-recipe" wx:if="{{item.showRecipe}}">
+            <text class="recipe-title">做法步骤：</text>
+            <text class="recipe-content">{{item.recipe}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="button-group">
+      <button class="action-btn refresh" bindtap="regenerateMenu">换一批</button>
+      <button class="action-btn back" bindtap="backToSettings">重新设置</button>
+    </view>
+  </view>
+</view> 
