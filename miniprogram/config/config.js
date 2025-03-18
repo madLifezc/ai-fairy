@@ -16,8 +16,8 @@ const config = {
 };
 
 // 根据环境返回对应配置 可以通过小程序环境变量或者手动设置
-const env = 'development';  
-// const env = 'production';
+// const env = 'development';  
+const env = 'production';
 
 const getConfig = () => {
   return config[env];

@@ -48,4 +48,21 @@
       </button>
     </view>
   </block>
+
+  <!-- 加载过渡界面 -->
+  <view class="loading-overlay" wx:if="{{loading}}">
+    <view class="loading-content">
+      <view class="loading-circle"></view>
+      <view class="loading-poem">
+        <text class="loading-text">万千生命如画卷徐徐展开，</text>
+        <text class="loading-text">恍若荷叶晨露，转瞬即逝。</text>
+      </view>
+      <view class="loading-progress">
+        <view class="progress-bar">
+          <view class="progress-inner"></view>
+        </view>
+        <text class="progress-text">正在为您生成天气壁纸...</text>
+      </view>
+    </view>
+  </view>
 </view> 

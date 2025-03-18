@@ -45,12 +45,10 @@ async def get_weather_report(request: Request) -> JSONResponse:
         async with httpx.AsyncClient(timeout=timeout) as client:
             response = await client.post(base_url, json=payload, headers=headers)
             response_data = response.json()
-            logger.info(f"response_data: {response_data}")
             # 获取响应数据中的data字段
             data = response_data.get("data", {})
             if not data:
                 raise Exception("未获取到天气数据")
-            logger.info(f"data: {data}")
             return JSONResponse(
                 content={
                     'code': 200,
