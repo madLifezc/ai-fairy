@@ -4,6 +4,7 @@
     "pages/tools/tools",
     "pages/profile/profile",
     "pages/food/food",
+    "pages/weather/weather",
     "pages/history/history",
     "pages/settings/settings",
     "pages/feedback/feedback",

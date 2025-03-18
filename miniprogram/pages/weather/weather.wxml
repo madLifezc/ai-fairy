@@ -1,0 +1,51 @@
+<!-- weather.wxml -->
+<view class="container">
+  <block wx:if="{{!showResult}}">
+    <view class="card">
+      <view class="title">每日天气壁纸</view>
+      
+      <view class="subtitle">
+        根据你所在的城市，每天推送精美的诗句和壁纸
+      </view>
+
+      <view class="input-section">
+        <view class="input-label">
+          请输入城市名
+          <text class="required">*</text>
+        </view>
+        <input 
+          class="city-input" 
+          type="text" 
+          placeholder="请输入你的城市名：如 北京、上海、成都"
+          placeholder-class="input-placeholder"
+          model:value="{{city}}"
+        />
+      </view>
+
+      <button class="submit-btn" bindtap="generateReport" loading="{{loading}}">
+        确认
+      </button>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="result-card">
+      <image 
+        class="weather-image" 
+        src="{{weatherData.image_url}}" 
+        mode="widthFix"
+      />
+      <view class="weather-poem">{{weatherData.poem}}</view>
+      
+      <view class="weather-info">
+        <view class="city-name">{{weatherData.city}}</view>
+        <view class="date-info">{{weatherData.date}} {{weatherData.weekday}} {{weatherData.weather}}</view>
+        <view class="temp-info">最高 {{weatherData.temp_high}}℃ 最低 {{weatherData.temp_low}}℃</view>
+      </view>
+
+      <button class="modify-btn" bindtap="modifyCity">
+        修改城市
+      </button>
+    </view>
+  </block>
+</view> 

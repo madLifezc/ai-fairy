@@ -16,8 +16,8 @@ const config = {
 };
 
 // 根据环境返回对应配置 可以通过小程序环境变量或者手动设置
-// const env = 'development';  
-const env = 'production';
+const env = 'development';  
+// const env = 'production';
 
 const getConfig = () => {
   return config[env];
@@ -27,6 +27,7 @@ const getConfig = () => {
 const apiPath = {
   aiChat: '/aichat',// 对话接口
   generateImage: '/generate_image',  // 添加生成图片接口
+  weather: '/weather',  // 添加天气接口
   // 在这里添加其他API路径
 };
 
