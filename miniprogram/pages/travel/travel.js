@@ -55,7 +55,7 @@ Page({
         url: `${config.baseUrl}${apiPath.travelPlan}`,
         method: 'POST',
         data: {
-          content: `我想去${inputValue}旅游，请帮我规划一下行程，包括必去景点、特色美食、交通建议、住宿推荐和旅游小贴士。`
+          content: `${inputValue}`
         },
         timeout: config.timeout,
         enableChunked: true,
