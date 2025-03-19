@@ -7,3 +7,4 @@ Pillow==10.1.0
 flask>=2.0.0
 cozepy>=0.13.0
 httpx>=0.27.2
+dashscope>=0.1.0

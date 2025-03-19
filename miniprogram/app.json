@@ -8,7 +8,8 @@
     "pages/history/history",
     "pages/settings/settings",
     "pages/feedback/feedback",
-    "pages/about/about"
+    "pages/about/about",
+    "pages/travel/travel"
   ],
   "window": {
     "backgroundTextStyle": "light",

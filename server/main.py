@@ -91,4 +91,5 @@ app.include_router(api_router, prefix="/api")
 if __name__ == "__main__":
     import uvicorn
     logger.info("启动服务器...")
-    uvicorn.run(app, host="0.0.0.0", port=9100) 
+    uvicorn.run("main:app", host="0.0.0.0", port=9100, reload=True)
+    # uvicorn.run(app, host="0.0.0.0", port=9100) 

@@ -28,6 +28,7 @@ const apiPath = {
   aiChat: '/aichat',// 对话接口
   generateImage: '/generate_image',  // 添加生成图片接口
   weather: '/weather',  // 添加天气接口
+  travelPlan: '/bailian_chat',  // 旅游助手接口
   // 在这里添加其他API路径
 };
 

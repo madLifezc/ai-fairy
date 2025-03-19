@@ -1,0 +1,75 @@
+<view class="container">
+  <view class="header">
+    <view class="header-bg"></view>
+    <view class="welcome-card">
+      <image class="assistant-avatar" src="../../images/airole/artist.jpg" />
+      <view class="welcome-content">
+        <text class="welcome-title">旅游助手</text>
+        <text class="welcome-text">你好，我是你的专属旅游规划师，告诉我你想去的地方，我会为你定制一份详细的旅游攻略。</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="chat-container">
+    <scroll-view 
+      scroll-y="true" 
+      class="chat-list"
+      scroll-into-view="{{scrollToView}}"
+      scroll-with-animation="true"
+      enhanced="true"
+      show-scrollbar="false"
+      bounces="true"
+    >
+      <view class="chat-content" wx:if="{{chatList.length > 0}}">
+        <view 
+          class="chat-item {{item.type === 'user' ? 'user' : 'assistant'}}" 
+          wx:for="{{chatList}}" 
+          wx:key="index"
+          id="msg-{{index}}"
+        >
+          <view class="avatar-container">
+            <image 
+              class="avatar" 
+              src="{{item.type === 'user' ? '../../images/airole/user.jpg' : '../../images/airole/artist.jpg'}}"
+            />
+          </view>
+          <view class="message-container">
+            <view class="chat-message {{item.type === 'user' ? 'user-message' : 'assistant-message'}}">
+              <text class="message-text" user-select="true">{{item.content}}</text>
+            </view>
+            <view class="message-time" wx:if="{{item.time}}">{{item.time}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="empty-state" wx:else>
+        <!-- <image class="empty-icon" src="/images/travel-empty.png" /> -->
+        <text class="empty-text">开始规划你的旅程吧！</text>
+      </view>
+    </scroll-view>
+
+    <view class="input-container">
+      <view class="input-wrapper">
+        <input 
+          class="message-input" 
+          placeholder="想去哪里玩？告诉我吧..." 
+          placeholder-class="input-placeholder"
+          value="{{inputValue}}"
+          bindinput="onInput"
+          bindconfirm="sendMessage"
+          confirm-type="send"
+          adjust-position="{{true}}"
+          cursor-spacing="20"
+        />
+        <button 
+          class="send-btn {{inputValue ? 'active' : ''}}" 
+          hover-class="button-hover"
+          bindtap="sendMessage"
+          disabled="{{!inputValue || loading}}"
+        >
+          <text wx:if="{{!loading}}" class="send-text">发送</text>
+          <view wx:else class="loading-icon"></view>
+        </button>
+      </view>
+    </view>
+  </view>
+</view> 
