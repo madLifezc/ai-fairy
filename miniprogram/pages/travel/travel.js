@@ -116,8 +116,14 @@ Page({
           if (response.data) {
             let chunk;
             if (response.data instanceof ArrayBuffer) {
-              const decoder = new TextDecoder('utf-8');
-              chunk = decoder.decode(response.data);
+              // 使用更可靠的方式处理中文字符
+              const uint8Array = new Uint8Array(response.data);
+              let binaryString = '';
+              uint8Array.forEach(byte => {
+                binaryString += String.fromCharCode(byte);
+              });
+              // 使用 decodeURIComponent 和 escape 来正确处理中文
+              chunk = decodeURIComponent(escape(binaryString));
             } else if (typeof response.data === 'object') {
               chunk = JSON.stringify(response.data);
             } else {
